@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div>
+    <span id="username"></span>
+    <span id="text1"></span>
+    <span id="text2"></span>
+    <span id="text3"></span>
+    <span id="text4"></span>
+  </div>
+
+  <form>
+    <input type="text" id="firstName">
+    <input type="text" id="lastName">
+    <input type="text" id="gender">
+    <input type="text" id="birthDate">
+    <button type="submit" id="saveData">Save</button>
+  </form>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics.js";
+    import { getDatabase, set, ref, update, get, push, onValue } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut  } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+  
+    const firebaseConfig = {
+      apiKey: "AIzaSyC_Hi5kX-pipye4c_URlQI0NBLw4UubkE4",
+      authDomain: "app-b0270.firebaseapp.com",
+      databaseURL: "https://app-b0270-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "app-b0270",
+      storageBucket: "app-b0270.appspot.com",
+      messagingSenderId: "905375352903",
+      appId: "1:905375352903:web:4e2212023f143d071d0962",
+      measurementId: "G-RSZCWFMNBJ"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const database = getDatabase(app);
+    const auth = getAuth();
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in, see docs for a list of available properties
+        // https://firebase.google.com/docs/reference/js/firebase.User
+        const uid = user.uid;
+
+        const userRef = ref(database, 'users/' + uid);
+          get(userRef).then((snapshot) => {
+            const userData = snapshot.val();
+            const displayName = userData.name;
+            const username = userData.username;
+            const email = userData.email;
+
+            document.getElementById('username').textContent = username;
+          }
+        );
+
+        const userDetail = ref(database, 'users/' + uid + '/' + 'details/');
+          get(userDetail).then((test) => {
+            const userDetail = test.val();
+            const test1 = userDetail.firstName;
+            const test2 = userDetail.lastName;
+            const test3 = userDetail.gender;
+            const test4 = userDetail.birthDate;
+
+
+            document.getElementById('text1').textContent = test1;
+            document.getElementById('text2').textContent = test2;
+            document.getElementById('text3').textContent = test3;
+            document.getElementById('text4').textContent = test4;
+          }
+        );
+
+        var firstName = document.getElementById('firstName').value;
+        var lastName = document.getElementById('lastName').value;
+        var gender = document.getElementById('gender').value;
+        var birthDate = document.getElementById('birthDate').value;
+
+        saveData.addEventListener('click',(e) => {
+          e.preventDefault();
+
+          var a1 = document.getElementById('firstName').value;
+          var a2 = document.getElementById('lastName').value;
+          var a3 = document.getElementById('gender').value;
+          var a4 = document.getElementById('birthDate').value;
+
+          const noteRef = ref(database, 'users/' + uid + '/' + 'details/');
+          update(noteRef, {
+            firstName: a1,
+            lastName: a2,
+            gender: a3,
+            birthDate: a4,
+          }).then(() => {
+
+            const userDetail = ref(database, 'users/' + uid + '/' + 'details/');
+            get(userDetail).then((test) => {
+              const userDetail = test.val();
+              const test1 = userDetail.firstName;
+              const test2 = userDetail.lastName;
+              const test3 = userDetail.gender;
+              const test4 = userDetail.birthDate;
+
+
+              document.getElementById('text1').textContent = test1;
+              document.getElementById('text2').textContent = test2;
+              document.getElementById('text3').textContent = test3;
+              document.getElementById('text4').textContent = test4;
+            });
+          });
+
+        });
+        //bla bla bla
+        // ...
+      } else {
+        // User is signed out
+        // ...
+        //bla bla bla
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+</body>
+</html>
